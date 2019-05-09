@@ -1,15 +1,12 @@
-# Caesar cipher for encrypting and decrypting text
-
-#' Encrypt and Decrypt text using the Caesar cipher
+# Caesar cipher for encrypting and decrypting text.
+#' Encrypt and decrypt text using the Caesar cipher.
 #'
 #' @param text
-#' String to be ciphered or deciphered
-#' @param direction
-#' Move the original characters the right or to the left
-#' @param distance
-#' How far to move the characters in the direction you choose.
-#' @param reverse
-#' If TRUE, deciphers the coded text
+#' String to be ciphered or deciphered.
+#' @param shift
+#' A single whole number for how far to move the characters in the direction (positive or negative) you choose. If not a whole number, it will be rounded to nearest whole number.
+#' @param decrypt
+#' If TRUE, (not default) deciphers the coded text.
 #'
 #' @return
 #' String of the ciphered/deciphered text
@@ -19,136 +16,100 @@
 #' # Please see this for more info.
 #' # https://en.wikipedia.org/wiki/Caesar_cipher
 #'
-#' caesar("cats are friends!")
-#' caesar("fdwv@duh@iulhqgv&", reverse = TRUE)
+#' caesar("Experience is the teacher of all things.")
+#' caesar("HAshulhqfhclvcwkhcwhdfkhucricdoocwklqjva", decrypt = TRUE)
 #'
-#' caesar("cats are friends!", direction = "right", distance = 40)
-#' caesar("ki10:izm:nzqmvl0;", direction = "right", distance = 40, reverse = TRUE)
+#' caesar("Veni, vidi, vici.",  shift = 40)
+#' caesar(",S1WKN9WRWKN9WQWL", shift = 40, decrypt = TRUE)
 #'
-#' caesar("cats are #1 friend!", direction = "left", distance = -12)
-#' caesar(", hgy f&ypy%f:&b@z", direction = "left", distance = -12, reverse = TRUE)
-caesar <- function(text, direction = "left", distance = 3, reverse = FALSE) {
-  if (!is.character(text)) {
-    stop("text must be a string!")
+#' caesar("No one is so brave that he is not disturbed by something unexpected.", shift = -12)
+#' caesar("Bc[cb:[,g[gc[{f]j:[h>]h[>:[,g[bch[;,ghif{:;[{m[gca:h>,b<[ib:ld:}h:;`",
+#'        shift = -12, decrypt = TRUE)
+caesar <- function(text,
+                   shift = 3,
+                   decrypt = FALSE) {
+  if (!is.character(text) || length(text) != 1) {
+    stop("text must be a single string!")
   }
 
-  if (!is.numeric(distance)) {
-    stop("distance must be a number!")
+  if (length(shift) != 1) {
+    stop("shift must be a single number!")
   }
 
-  if (!distance %in% -46:46) {
-    stop("distance must be between -46 and 46")
+  if (!is.numeric(shift)) {
+    stop("shift must be a number!")
   }
 
-  direction <- tolower(direction)
-  if (!direction %in% c("left", "right")) {
-    stop("direction must be 'left' or 'right'")
-  }
+  text <- gsub('\\"', "\\'", text)
 
+  shift <- round(shift)
+  shift <- shift %% length(.alphabet$original)
+  .alphabet$number <- 1:nrow(.alphabet)
+  .alphabet$cipher <- binhf::shift(.alphabet$original,
+                                   places = -shift)
 
-  alphabet <- data.frame(original = letters,
-                         stringsAsFactors = FALSE)
-  special <- data.frame(original = c(0:9, " ", "!", ",",
-                                     "@", "&", "%",
-                                     "-", "_", ":",
-                                     ";", "?", "'"))
-  alphabet <- rbind(alphabet, special)
-  alphabet$cipher <- binhf::shift(alphabet$original,
-                                  places = distance,
-                                  dir = direction)
-  alphabet <- rbind(alphabet, data.frame(original = c("#", "\n"),
-                                         cipher = c("#", "\n")))
-
-
-  if (!reverse) {
-    text <- tolower(text)
-    text <- gsub("[^[:alnum:][:space:]',!@&%-_:;]", "", text)
-    text <- gsub("\\.", "", text)
-    text <- gsub(" +", " ", text)
-
-    for (i in 1:nchar(text)) {
-      index_num <- which(substr(text, i, i) == alphabet$original)
-      substr(text, i, i) <- alphabet$cipher[index_num]
-    }
-  } else {
-    text <- gsub(" +", " ", text)
-    for (i in 1:nchar(text)) {
-      index_num <- which(substr(text, i, i) == alphabet$cipher)
-      substr(text, i, i) <- alphabet$original[index_num]
-    }
-  }
-
-  text <- gsub("\\\n", "\n#", text)
-  text <- gsub("#+", "#", text)
-  cat(text)
+  text <- encrypt_decrypt(text, .alphabet, decrypt)
+  return(text)
 }
 
-#' Encrypt and Decrypt text using pseduorandom number generation
+#' Encrypt and decrypt text using pseudorandom number generation based on the seed set.
 #'
 #' @param text
-#' String to be ciphered or deciphered
+#' String to be ciphered or deciphered.
 #' @param seed
-#' A number to set the seed which will pseudorandomly rearrange
+#' A single number to set the seed which will pseudorandomly rearrange
 #' the original characters
-#' @param reverse
-#' If TRUE, deciphers coded text
+#' @param decrypt
+#' If TRUE (not default), deciphers the coded text.
 #'
 #' @return
 #' String of the ciphered/deciphered text
 #' @export
 #'
 #' @examples
-#' seed_cipher("cats are friends!")
-#' seed_cipher("bc204c5d495ud?:08", reverse = TRUE)
+#' seed_cipher("Cowards die many times before their deaths")
+#' seed_cipher("'Ced<,#G,QhG$dXoG/Q$h#G+h(C<hG/0hQ<G,hd/0#",
+#'             decrypt = TRUE)
 #'
+#' seed_cipher("Men willingly believe what they wish.",
+#'              seed = 2354)
+#' seed_cipher("q39l*D66D9;6.l%36D3d3l*<p4l4<3.l*D <h",
+#'             seed = 2354,
+#'             decrypt = TRUE)
 #'
-#' seed_cipher("cats are friends!", seed = 2354)
-#' seed_cipher("li%1sid3szdp3 j1g", seed = 2354, reverse = TRUE)
-#'
-#' seed_cipher("cats are #1 friend!", seed = -100)
-#' seed_cipher("hd2imdjpmfm-jcpe&q", seed = -100, reverse = TRUE)
-seed_cipher <- function(text, seed = 64, reverse = FALSE) {
-  if (!is.character(text)) {
-    stop("text must be a string!")
+#' seed_cipher("the valiant never taste of death but once.",
+#'             seed = -100)
+#' seed_cipher("*QDc3f>efk*ckD3D{c*fu*DcS'c]Df*Qcy%*cSkoDi",
+#'             seed = -100,
+#'             decrypt = TRUE)
+seed_cipher <- function(text,
+                        seed = 64,
+                        decrypt = FALSE) {
+  if (!is.character(text) || length(text) != 1) {
+    stop("text must be a single string!")
+  }
+
+  if (length(seed) != 1) {
+    stop("seed must be a single number!")
   }
 
   if (!is.numeric(seed)) {
     stop("seed must be a number!")
   }
 
-  alphabet <- data.frame(original = letters,
-                         stringsAsFactors = FALSE)
-  special <- data.frame(original = c(0:9, " ", "!", ",",
-                                     "@", "&", "%",
-                                     "-", "_", ":",
-                                     ";", "?", "'"))
-  alphabet <- rbind(alphabet, special)
-  set.seed(seed)
-  alphabet$cipher <- alphabet$original[sample(1:48, 48, replace = FALSE)]
-  alphabet <- rbind(alphabet, data.frame(original = c("#", "\n"),
-                                         cipher = c("#", "\n")))
+  text <- gsub('\\"', "\\'", text)
+
+  # Sets the R version so seed always the same regardless of
+  # version user is using.
+  suppressWarnings(base::RNGversion("3.5.3"))
+  base::set.seed(seed)
+  .alphabet$cipher <- .alphabet$original[sample(1:nrow(.alphabet),
+                                                nrow(.alphabet),
+                                                replace = FALSE)]
 
 
-  if (!reverse) {
-    text <- tolower(text)
-    text <- gsub("[^[:alnum:][:space:]',!@&%-_:;]", "", text)
-    text <- gsub("\\.", "", text)
-    text <- gsub(" +", " ", text)
-
-
-    for (i in 1:nchar(text)) {
-      index_num <- which(substr(text, i, i) == alphabet$original)
-      substr(text, i, i) <- alphabet$cipher[index_num]
-    }
-  } else {
-    text <- gsub(" +", " ", text)
-    for (i in 1:nchar(text)) {
-      index_num <- which(substr(text, i, i) == alphabet$cipher)
-      substr(text, i, i) <- alphabet$original[index_num]
-    }
-  }
-
-  text <- gsub("\\\n", "\n#", text)
-  text <- gsub("#+", "#", text)
-  cat(text)
+  text <- encrypt_decrypt(text, .alphabet, decrypt)
+  return(text)
 }
+
+

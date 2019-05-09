@@ -2,33 +2,38 @@
 % Please edit documentation in R/caesar.R
 \name{seed_cipher}
 \alias{seed_cipher}
-\title{Encrypt and Decrypt text using pseduorandom number generation}
+\title{Encrypt and decrypt text using pseudorandom number generation based on the seed set.}
 \usage{
-seed_cipher(text, seed = 64, reverse = FALSE)
+seed_cipher(text, seed = 64, decrypt = FALSE)
 }
 \arguments{
-\item{text}{String to be ciphered or deciphered}
+\item{text}{String to be ciphered or deciphered.}
 
-\item{seed}{A number to set the seed which will pseudorandomly rearrange
+\item{seed}{A single number to set the seed which will pseudorandomly rearrange
 the original characters}
 
-\item{reverse}{If TRUE, deciphers coded text}
+\item{decrypt}{If TRUE (not default), deciphers the coded text.}
 }
 \value{
 String of the ciphered/deciphered text
 }
 \description{
-Encrypt and Decrypt text using pseduorandom number generation
+Encrypt and decrypt text using pseudorandom number generation based on the seed set.
 }
 \examples{
-seed_cipher("cats are friends!")
-seed_cipher("bc204c5d495ud?:08", reverse = TRUE)
+seed_cipher("Cowards die many times before their deaths")
+seed_cipher("'Ced<,#G,QhG$dXoG/Q$h#G+h(C<hG/0hQ<G,hd/0#",
+            decrypt = TRUE)
 
+seed_cipher("Men willingly believe what they wish.",
+             seed = 2354)
+seed_cipher("q39l*D66D9;6.l\%36D3d3l*<p4l4<3.l*D <h",
+            seed = 2354,
+            decrypt = TRUE)
 
-seed_cipher("cats are friends!", seed = 2354)
-seed_cipher("li\%1sid3szdp3 j1g", seed = 2354, reverse = TRUE)
-
-seed_cipher("cats are #1 friend!", seed = -100)
-seed_cipher("hd2imdjpmfm-jcpe&q", seed = -100, reverse = TRUE)
+seed_cipher("the valiant never taste of death but once.",
+            seed = -100)
+seed_cipher("*QDc3f>efk*ckD3D{c*fu*DcS'c]Df*Qcy\%*cSkoDi",
+            seed = -100,
+            decrypt = TRUE)
 }
-

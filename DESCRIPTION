@@ -1,21 +1,24 @@
 Package: caesar
 Type: Package
 Title: Encrypts and Decrypts Strings
-Version: 0.1.0
-Authors@R: person("Jacob", "Kaplan", email = "jacobkap@sas.upenn.edu", role = c("aut", "cre"))
+Version: 1.0.0
+Authors@R: person("Jacob", "Kaplan", email = "jkkaplan6@gmail.com", 
+    role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0601-0387"))
 Description: Encrypts and decrypts strings using either the Caesar cipher or a
     pseudorandom number generation (using set.seed()) method.
-Depends:
 Imports: binhf
-License: GPL
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/jacobkap/caesar
 BugReports: https://github.com/jacobkap/caesar/issues
-RoxygenNote: 5.0.1.9000
+RoxygenNote: 6.1.1
+Suggests: testthat, covr, knitr, rmarkdown, spelling
+VignetteBuilder: knitr
+Language: en-US
 NeedsCompilation: no
-Packaged: 2017-01-17 21:18:57 UTC; user
-Author: Jacob Kaplan [aut, cre]
-Maintainer: Jacob Kaplan <jacobkap@sas.upenn.edu>
+Packaged: 2019-05-09 15:43:49 UTC; user
+Author: Jacob Kaplan [aut, cre] (<https://orcid.org/0000-0002-0601-0387>)
+Maintainer: Jacob Kaplan <jkkaplan6@gmail.com>
 Repository: CRAN
-Date/Publication: 2017-01-18 08:37:40
+Date/Publication: 2019-05-09 20:10:17 UTC
